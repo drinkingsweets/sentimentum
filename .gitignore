@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Node
+node_modules/
+npm-debug.log
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Java
+target/
+*.class
+
+# Docker
+.dockerignore
