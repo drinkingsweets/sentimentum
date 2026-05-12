@@ -1,5 +1,6 @@
 package com.sentimentum.api.message;
 
+import com.sentimentum.api.message.stats.SentimentStatsService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -17,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class MessageController {
 
     private final MessageService service;
+    private final SentimentStatsService statsService;
 
-    public MessageController(MessageService service) {
+    public MessageController(MessageService service, SentimentStatsService statsService) {
         this.service = service;
+        this.statsService = statsService;
     }
 
     @GetMapping("/messages")
@@ -46,6 +49,6 @@ public class MessageController {
 
     @GetMapping("/analytics/sentiment-stats")
     public List<SentimentStatsDto> sentimentStats(@RequestParam(required = false) UUID projectId) {
-        return service.sentimentStats(projectId);
+        return statsService.calculate(projectId);
     }
 }

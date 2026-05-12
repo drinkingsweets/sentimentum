@@ -3,7 +3,6 @@ package com.sentimentum.api.message;
 import com.sentimentum.api.common.NotFoundException;
 import com.sentimentum.api.datasource.DataSourceService;
 import java.time.Instant;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -53,19 +52,6 @@ public class MessageService {
     public List<AnalysisResultDto> listResults(UUID messageId) {
         List<AnalysisResult> result = messageId == null ? results.findAll() : results.findByMessageId(messageId);
         return result.stream().map(AnalysisResultDto::from).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<SentimentStatsDto> sentimentStats(UUID projectId) {
-        EnumMap<Sentiment, Long> counts = new EnumMap<>(Sentiment.class);
-        for (Sentiment sentiment : Sentiment.values()) {
-            counts.put(sentiment, 0L);
-        }
-        List<AnalysisResult> source = projectId == null ? results.findAll() : results.findByMessageSourceProjectId(projectId);
-        source.forEach(result -> counts.compute(result.getSentiment(), (key, value) -> value + 1));
-        return counts.entrySet().stream()
-                .map(entry -> new SentimentStatsDto(entry.getKey(), entry.getValue()))
-                .toList();
     }
 
     @Transactional(readOnly = true)
