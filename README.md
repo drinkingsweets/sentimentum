@@ -3,7 +3,7 @@
 
 ## Быстрый старт
 ```bash
-docker-compose up 
+docker compose up --build
 ```
 ## Структура
 - backend/ - Java Spring Boot

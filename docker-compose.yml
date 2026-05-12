@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: sentimentum-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-sentimentum}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-sentimentum}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-sentimentum}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_FLYWAY_ENABLED: "true"
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sentimentum-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sentimentum}
+      POSTGRES_USER: ${POSTGRES_USER:-sentimentum}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sentimentum}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sentimentum} -d ${POSTGRES_DB:-sentimentum}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
