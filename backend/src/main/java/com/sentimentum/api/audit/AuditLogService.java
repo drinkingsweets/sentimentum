@@ -19,12 +19,12 @@ public class AuditLogService {
 
     @Transactional(readOnly = true)
     public List<AuditLogDto> list(UUID userId) {
-        List<AuditLog> result = userId == null ? auditLogs.findAll() : auditLogs.findByUserId(userId);
+        List<AuditLog> result = auditLogs.findByUserId(userId);
         return result.stream().map(AuditLogDto::from).toList();
     }
 
     @Transactional
-    public AuditLogDto create(CreateAuditLogRequest request) {
-        return AuditLogDto.from(auditLogs.save(new AuditLog(users.getEntity(request.userId()), request.action())));
+    public AuditLogDto create(CreateAuditLogRequest request, UUID userId) {
+        return AuditLogDto.from(auditLogs.save(new AuditLog(users.getEntity(userId), request.action())));
     }
 }

@@ -1,9 +1,11 @@
 package com.sentimentum.api.report;
 
+import com.sentimentum.api.security.AuthenticatedUser;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,13 +25,13 @@ public class ReportController {
     }
 
     @GetMapping
-    public List<ReportDto> list(@RequestParam(required = false) UUID projectId) {
-        return service.list(projectId);
+    public List<ReportDto> list(@AuthenticationPrincipal AuthenticatedUser user, @RequestParam(required = false) UUID projectId) {
+        return service.list(projectId, user.getId());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReportDto create(@Valid @RequestBody CreateReportRequest request) {
-        return service.create(request);
+    public ReportDto create(@AuthenticationPrincipal AuthenticatedUser user, @Valid @RequestBody CreateReportRequest request) {
+        return service.create(request, user.getId());
     }
 }

@@ -19,18 +19,20 @@ public class DataSourceService {
     }
 
     @Transactional(readOnly = true)
-    public List<DataSourceDto> list(UUID projectId) {
-        List<DataSource> result = projectId == null ? sources.findAll() : sources.findByProjectId(projectId);
+    public List<DataSourceDto> list(UUID projectId, UUID ownerId) {
+        List<DataSource> result = projectId == null
+                ? sources.findByProjectOwnerId(ownerId)
+                : sources.findByProjectIdAndProjectOwnerId(projectId, ownerId);
         return result.stream().map(DataSourceDto::from).toList();
     }
 
     @Transactional
-    public DataSourceDto create(CreateDataSourceRequest request) {
+    public DataSourceDto create(CreateDataSourceRequest request, UUID ownerId) {
         DataSource source = new DataSource(
                 request.name(),
                 request.link(),
                 request.type(),
-                projects.getEntity(request.projectId())
+                projects.getOwnedEntity(request.projectId(), ownerId)
         );
         return DataSourceDto.from(sources.save(source));
     }
@@ -38,5 +40,11 @@ public class DataSourceService {
     @Transactional(readOnly = true)
     public DataSource getEntity(UUID id) {
         return sources.findById(id).orElseThrow(() -> new NotFoundException("Data source not found: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public DataSource getOwnedEntity(UUID id, UUID ownerId) {
+        return sources.findByIdAndProjectOwnerId(id, ownerId)
+                .orElseThrow(() -> new NotFoundException("Data source not found: " + id));
     }
 }
