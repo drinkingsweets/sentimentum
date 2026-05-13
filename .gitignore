@@ -10,6 +10,8 @@ Thumbs.db
 # Node
 node_modules/
 npm-debug.log
+dist/
+*.tsbuildinfo
 
 # Python
 __pycache__/
