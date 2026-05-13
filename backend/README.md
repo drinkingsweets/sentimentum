@@ -24,6 +24,7 @@ mvn test
 ## Основные endpoints
 
 - `GET/POST /api/users`
+- `GET /api/users/me`
 - `GET/POST /api/projects`
 - `GET/POST /api/data-sources`
 - `GET/POST /api/messages`
@@ -31,6 +32,43 @@ mvn test
 - `GET /api/analytics/sentiment-stats?projectId={uuid}`
 - `GET/POST /api/reports`
 - `GET/POST /api/audit-logs`
+- `POST /api/youtube/comments/import`
+
+## Авторизация
+
+Регистрация пользователя открыта:
+
+```bash
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Analyst","email":"analyst@example.com","password":"secret"}'
+```
+
+Пароль сохраняется в БД как BCrypt-хеш. Остальные endpoints требуют HTTP Basic:
+
+```bash
+curl -u analyst@example.com:secret http://localhost:8080/api/projects
+```
+
+Проекты, источники, сообщения, результаты анализа, отчеты и аудит фильтруются по текущему пользователю.
+Создать проект для другого пользователя через request body нельзя.
+
+## Импорт комментариев YouTube
+
+Нужен ключ YouTube Data API:
+
+```bash
+export YOUTUBE_API_KEY=...
+```
+
+Пример импорта:
+
+```bash
+curl -u analyst@example.com:secret \
+  -X POST http://localhost:8080/api/youtube/comments/import \
+  -H "Content-Type: application/json" \
+  -d '{"projectId":"PROJECT_UUID","video":"https://www.youtube.com/watch?v=VIDEO_ID","maxResults":50}'
+```
 
 ## Пример минимального сценария
 

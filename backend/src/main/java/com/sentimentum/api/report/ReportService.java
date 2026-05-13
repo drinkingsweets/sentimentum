@@ -21,16 +21,18 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReportDto> list(UUID projectId) {
-        List<Report> result = projectId == null ? reports.findAll() : reports.findByProjectId(projectId);
+    public List<ReportDto> list(UUID projectId, UUID ownerId) {
+        List<Report> result = projectId == null
+                ? reports.findByProjectOwnerId(ownerId)
+                : reports.findByProjectIdAndProjectOwnerId(projectId, ownerId);
         return result.stream().map(ReportDto::from).toList();
     }
 
     @Transactional
-    public ReportDto create(CreateReportRequest request) {
+    public ReportDto create(CreateReportRequest request, UUID ownerId) {
         Report report = new Report(
-                users.getEntity(request.userId()),
-                projects.getEntity(request.projectId()),
+                users.getEntity(ownerId),
+                projects.getOwnedEntity(request.projectId(), ownerId),
                 request.title(),
                 request.data(),
                 request.format()
