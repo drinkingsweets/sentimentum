@@ -12,6 +12,7 @@ node_modules/
 npm-debug.log
 dist/
 *.tsbuildinfo
+.vite/
 
 # Python
 __pycache__/

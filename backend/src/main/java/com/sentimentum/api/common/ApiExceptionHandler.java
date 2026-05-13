@@ -31,6 +31,11 @@ public class ApiExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleUnavailable(IllegalStateException ex) {
+        return error(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
     private ResponseEntity<Map<String, Object>> error(HttpStatus status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
