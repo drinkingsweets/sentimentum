@@ -33,6 +33,7 @@ mvn test
 - `GET/POST /api/reports`
 - `GET/POST /api/audit-logs`
 - `POST /api/youtube/comments/import`
+- `POST /api/csv/messages/import`
 
 ## Авторизация
 
@@ -52,6 +53,27 @@ curl -u analyst@example.com:secret http://localhost:8080/api/projects
 
 Проекты, источники, сообщения, результаты анализа, отчеты и аудит фильтруются по текущему пользователю.
 Создать проект для другого пользователя через request body нельзя.
+
+## Временная разметка без ML-модели
+
+Пока ML-модель не подключена, данные без разметки получают случайные `sentiment` и `confidence`.
+Это используется для внешних источников без готовой тональности, например YouTube-комментариев.
+
+CSV можно импортировать в формате:
+
+```csv
+author,content,language,tag,sentiment,confidence,createdAt
+anna_k,"Доставка приехала вовремя, упаковка целая, все отлично.",ru,доставка,POSITIVE,0.94,2026-05-12T09:10:00Z
+```
+
+Если в строке CSV есть `sentiment` и `confidence`, они сохраняются как есть. Если этих колонок или значений нет,
+backend поставит случайную временную разметку.
+
+```bash
+curl -u analyst@example.com:secret \
+  -X POST "http://localhost:8080/api/csv/messages/import?projectId=PROJECT_UUID" \
+  -F "file=@/path/to/sample-comments.csv"
+```
 
 ## Импорт комментариев YouTube
 

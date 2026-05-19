@@ -3,6 +3,10 @@ package com.sentimentum.api.youtube;
 import com.sentimentum.api.datasource.DataSource;
 import com.sentimentum.api.datasource.DataSourceRepository;
 import com.sentimentum.api.datasource.DataSourceType;
+import com.sentimentum.api.labeling.RandomSentimentLabeler;
+import com.sentimentum.api.labeling.SentimentLabel;
+import com.sentimentum.api.message.AnalysisResult;
+import com.sentimentum.api.message.AnalysisResultRepository;
 import com.sentimentum.api.message.Message;
 import com.sentimentum.api.message.MessageRepository;
 import com.sentimentum.api.project.Project;
@@ -18,18 +22,24 @@ public class YouTubeImportService {
     private final ProjectService projects;
     private final DataSourceRepository sources;
     private final MessageRepository messages;
+    private final AnalysisResultRepository results;
     private final YouTubeCommentsClient commentsClient;
+    private final RandomSentimentLabeler labeler;
 
     public YouTubeImportService(
             ProjectService projects,
             DataSourceRepository sources,
             MessageRepository messages,
-            YouTubeCommentsClient commentsClient
+            AnalysisResultRepository results,
+            YouTubeCommentsClient commentsClient,
+            RandomSentimentLabeler labeler
     ) {
         this.projects = projects;
         this.sources = sources;
         this.messages = messages;
+        this.results = results;
         this.commentsClient = commentsClient;
+        this.labeler = labeler;
     }
 
     @Transactional
@@ -55,7 +65,10 @@ public class YouTubeImportService {
                         comment.createdAt()
                 ))
                 .toList();
-        messages.saveAll(imported);
+        messages.saveAll(imported).forEach(message -> {
+            SentimentLabel label = labeler.label();
+            results.save(new AnalysisResult(message, label.sentiment(), label.confidence()));
+        });
 
         return new ImportYouTubeCommentsResponse(source.getId(), videoId, imported.size());
     }
