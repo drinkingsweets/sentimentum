@@ -22,3 +22,6 @@ __pycache__/
 # Java
 target/
 *.class
+
+# Generated reports
+build/
