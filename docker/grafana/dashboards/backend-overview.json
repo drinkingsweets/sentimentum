@@ -587,7 +587,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (source_type) (increase(sentimentum_imported_messages_total[1h]))",
+          "expr": "sum by (source_type) (clamp_min(sentimentum_imported_messages_total - (sentimentum_imported_messages_total offset 1h or sentimentum_imported_messages_total * 0), 0))",
           "legendFormat": "{{source_type}}",
           "refId": "A"
         }
@@ -662,7 +662,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (source_type, label_mode) (increase(sentimentum_sentiment_labels_total[1h]))",
+          "expr": "sum by (source_type, label_mode) (clamp_min(sentimentum_sentiment_labels_total - (sentimentum_sentiment_labels_total offset 1h or sentimentum_sentiment_labels_total * 0), 0))",
           "legendFormat": "{{source_type}} / {{label_mode}}",
           "refId": "A"
         }

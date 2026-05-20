@@ -20,6 +20,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/debug/fail").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/users").permitAll()
                         .anyRequest().authenticated()
                 )
