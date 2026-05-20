@@ -9,6 +9,7 @@ import com.sentimentum.api.message.AnalysisResult;
 import com.sentimentum.api.message.AnalysisResultRepository;
 import com.sentimentum.api.message.Message;
 import com.sentimentum.api.message.MessageRepository;
+import com.sentimentum.api.metrics.ImportMetrics;
 import com.sentimentum.api.project.Project;
 import com.sentimentum.api.project.ProjectService;
 import java.util.List;
@@ -25,6 +26,7 @@ public class YouTubeImportService {
     private final AnalysisResultRepository results;
     private final YouTubeCommentsClient commentsClient;
     private final RandomSentimentLabeler labeler;
+    private final ImportMetrics metrics;
 
     public YouTubeImportService(
             ProjectService projects,
@@ -32,7 +34,8 @@ public class YouTubeImportService {
             MessageRepository messages,
             AnalysisResultRepository results,
             YouTubeCommentsClient commentsClient,
-            RandomSentimentLabeler labeler
+            RandomSentimentLabeler labeler,
+            ImportMetrics metrics
     ) {
         this.projects = projects;
         this.sources = sources;
@@ -40,6 +43,7 @@ public class YouTubeImportService {
         this.results = results;
         this.commentsClient = commentsClient;
         this.labeler = labeler;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -69,6 +73,9 @@ public class YouTubeImportService {
             SentimentLabel label = labeler.label();
             results.save(new AnalysisResult(message, label.sentiment(), label.confidence()));
         });
+
+        metrics.recordImportedMessages("youtube", imported.size());
+        metrics.recordCreatedLabels("youtube", "random", imported.size());
 
         return new ImportYouTubeCommentsResponse(source.getId(), videoId, imported.size());
     }

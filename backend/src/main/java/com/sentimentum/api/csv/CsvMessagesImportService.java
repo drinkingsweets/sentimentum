@@ -10,6 +10,7 @@ import com.sentimentum.api.message.AnalysisResultRepository;
 import com.sentimentum.api.message.Message;
 import com.sentimentum.api.message.MessageRepository;
 import com.sentimentum.api.message.Sentiment;
+import com.sentimentum.api.metrics.ImportMetrics;
 import com.sentimentum.api.project.Project;
 import com.sentimentum.api.project.ProjectService;
 import java.io.BufferedReader;
@@ -34,19 +35,22 @@ public class CsvMessagesImportService {
     private final MessageRepository messages;
     private final AnalysisResultRepository results;
     private final RandomSentimentLabeler labeler;
+    private final ImportMetrics metrics;
 
     public CsvMessagesImportService(
             ProjectService projects,
             DataSourceRepository sources,
             MessageRepository messages,
             AnalysisResultRepository results,
-            RandomSentimentLabeler labeler
+            RandomSentimentLabeler labeler,
+            ImportMetrics metrics
     ) {
         this.projects = projects;
         this.sources = sources;
         this.messages = messages;
         this.results = results;
         this.labeler = labeler;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -92,6 +96,10 @@ public class CsvMessagesImportService {
         } catch (IOException ex) {
             throw new IllegalArgumentException("Cannot read CSV file", ex);
         }
+
+        metrics.recordImportedMessages("csv", imported);
+        metrics.recordCreatedLabels("csv", "provided", imported - randomLabeled);
+        metrics.recordCreatedLabels("csv", "random", randomLabeled);
 
         return new ImportCsvMessagesResponse(source.getId(), imported, randomLabeled);
     }

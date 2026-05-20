@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Sentimentum
+    orgId: 1
+    folder: Sentimentum
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

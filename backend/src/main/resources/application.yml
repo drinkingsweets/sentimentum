@@ -29,4 +29,16 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: sentimentum-backend
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
