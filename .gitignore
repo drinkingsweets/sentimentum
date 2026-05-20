@@ -22,6 +22,3 @@ __pycache__/
 # Java
 target/
 *.class
-
-# Docker
-.dockerignore

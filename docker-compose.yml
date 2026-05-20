@@ -1,4 +1,16 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: sentimentum-frontend
+    environment:
+      VITE_BACKEND_PROXY_TARGET: http://backend:8080
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend

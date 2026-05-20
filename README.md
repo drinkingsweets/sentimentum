@@ -5,6 +5,10 @@
 ```bash
 docker compose up --build
 ```
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8080`
+
 ## Структура
 - backend/ - Java Spring Boot
 

@@ -16,3 +16,5 @@ npm run dev
 ```bash
 VITE_API_BASE_URL=http://localhost:8080 npm run dev
 ```
+
+В Docker Compose прокси `/api` направляется на backend-контейнер через `VITE_BACKEND_PROXY_TARGET=http://backend:8080`.
