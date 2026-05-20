@@ -79,3 +79,16 @@ jobs:
           name: quality-gate-report
           path: build/reports/
           if-no-files-found: error
+
+      - name: Send warning email
+        if: always()
+        env:
+          QUALITY_GATE_JSON: build/reports/quality-gate.json
+          QUALITY_GATE_REPORT: build/reports/quality-gate.md
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          QUALITY_ALERT_FROM: ${{ secrets.QUALITY_ALERT_FROM }}
+          QUALITY_ALERT_TO: ${{ secrets.QUALITY_ALERT_TO }}
+        run: python3 tools/send_quality_warning_email.py
